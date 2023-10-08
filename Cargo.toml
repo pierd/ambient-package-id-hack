@@ -1,9 +1,9 @@
 [package]
 name = "ambient-package-id-hack"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Kuba Jaroszewski <jakub.jaroszewski@gmail.com>"]
-description = "Generate valid [Ambient](https://ambient.run) package IDs with a given prefix"
+description = "Generate valid Ambient.run package IDs with a given prefix"
 repository = "https://github.com/pierd/ambient-package-id-hack"
 homepage = "https://github.com/pierd/ambient-package-id-hack"
 keywords = ["ambient", "gamedev"]
