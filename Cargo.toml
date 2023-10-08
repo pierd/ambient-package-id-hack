@@ -1,0 +1,18 @@
+[package]
+name = "ambient-package-id-hack"
+version = "0.1.0"
+edition = "2021"
+authors = ["Kuba Jaroszewski <jakub.jaroszewski@gmail.com>"]
+description = "Simple UDP proxy to simulate network conditions"
+repository = "https://github.com/pierd/ambient-package-id-hack"
+homepage = "https://github.com/pierd/ambient-package-id-hack"
+keywords = ["ambient", "gamedev"]
+categories = ["development-tools"]
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+data-encoding = "2.4.0"
+rand = "0.8.5"
+sha2 = "0.10"
+thiserror = "1.0.49"
