@@ -1,6 +1,6 @@
 [package]
 name = "ambient-package-id-hack"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 authors = ["Kuba Jaroszewski <jakub.jaroszewski@gmail.com>"]
 description = "Generate valid [Ambient](https://ambient.run) package IDs with a given prefix"

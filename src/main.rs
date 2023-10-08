@@ -5,7 +5,7 @@ const DATA_LENGTH: usize = 12;
 const CHECKSUM_LENGTH: usize = 8;
 const TOTAL_LENGTH: usize = DATA_LENGTH + CHECKSUM_LENGTH;
 
-#[derive(Clone, Copy, Debug, Error)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Error)]
 pub enum GenerateError {
     #[error("Prefix can include only valid base32 characters (a-z, 2-7)")]
     InvalidCharacter,
@@ -22,28 +22,30 @@ pub fn generate_with_prefix(prefix: &str) -> Result<String, GenerateError> {
         let characters_missing_to_full_byte = bits_missing_to_full_byte.div_ceil(5);
         for _ in 0..characters_missing_to_full_byte {
             prefix.push('A');
-        } 
+        }
     }
     let prefix = prefix.as_bytes();
 
     // validate that prefix is a valid base32 encoding
-    if !prefix.iter().all(|b| b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".contains(b)) {
+    if !prefix
+        .iter()
+        .all(|b| b"ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".contains(b))
+    {
         return Err(GenerateError::InvalidCharacter);
     }
-    if let Some(first_byte) = prefix.first() {
-        if !(b'A'..=b'Z').contains(first_byte) {
-            return Err(GenerateError::InvalidFirstCharacter);
-        }
+    if prefix.first().map(u8::is_ascii_uppercase) == Some(false) {
+        return Err(GenerateError::InvalidFirstCharacter);
     }
 
-    let prefix = data_encoding::BASE32_NOPAD.decode(prefix).expect("prefix should have been validated by this point");
+    let prefix = data_encoding::BASE32_NOPAD
+        .decode(prefix)
+        .expect("prefix should have been validated by this point");
 
     let mut data: [u8; DATA_LENGTH] = rand::random();
     for (d, p) in data.iter_mut().zip(prefix.into_iter()) {
         *d = p;
     }
-    let checksum: [u8; CHECKSUM_LENGTH] = sha2::Sha256::digest(data)
-        [0..CHECKSUM_LENGTH]
+    let checksum: [u8; CHECKSUM_LENGTH] = sha2::Sha256::digest(data)[0..CHECKSUM_LENGTH]
         .try_into()
         .unwrap();
 
@@ -64,7 +66,7 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use super::generate_with_prefix;
+    use super::*;
 
     #[test]
     fn test_generate() {
@@ -82,8 +84,27 @@ mod tests {
 
     #[test]
     fn test_generate_too_long() {
-        let generated = generate_with_prefix("toolongtoevenfitinthegeneratedpackageidbutwhocaresitshouldbetrimmed").unwrap();
+        let generated = generate_with_prefix(
+            "toolongtoevenfitinthegeneratedpackageidbutwhocaresitshouldbetrimmed",
+        )
+        .unwrap();
         let actual_prefix = "toolongtoevenfitint";
         assert_eq!(&generated[0..actual_prefix.len()], actual_prefix);
+    }
+
+    #[test]
+    fn test_failures() {
+        assert_eq!(
+            generate_with_prefix("2isnotavalidfirstcharacter"),
+            Err(GenerateError::InvalidFirstCharacter)
+        );
+        assert_eq!(
+            generate_with_prefix("thereisno1inbase32"),
+            Err(GenerateError::InvalidCharacter)
+        );
+        assert_eq!(
+            generate_with_prefix("dontpad="),
+            Err(GenerateError::InvalidCharacter)
+        );
     }
 }
