@@ -2,6 +2,12 @@
 
 Generate valid [Ambient](https://ambient.run) package IDs with a given prefix.
 
+## Installation
+
+```sh
+$ cargo install ambient-package-id-hack
+```
+
 ## Usage
 
 ```sh
